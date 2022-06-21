@@ -4,7 +4,7 @@ dash_html_components==1.1.2
 dash_table==4.11.2
 pandas==1.4.2
 plotly==5.6.0
-Werkzeug==2.1.2
 django
 gunicorn
 django-heroku
+Werkzeug==2.1.2
