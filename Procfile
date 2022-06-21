@@ -1,1 +1,1 @@
-web: gunicorn app:server
+web: gunicorn dash_micro_test_additions_20220614:app
