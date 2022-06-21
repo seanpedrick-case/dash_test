@@ -7,4 +7,4 @@ plotly==5.6.0
 django
 gunicorn
 django-heroku
-Werkzeug==2.1.2
+Werkzeug==2.0.0
