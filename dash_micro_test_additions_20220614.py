@@ -108,43 +108,52 @@ server = app.server
 # Set up the layout with a single graph
 app.layout = html.Div([
     
-    # Title and break
-    html.H1('KS2 students achieving expected standard in\nreading, writing, and maths'),
-    html.Br(),
+    dcc.Tabs([
+        dcc.Tab(label='Tab one', children=[
+        # Title and break
+        html.H1('KS2 students achieving expected standard in\nreading, writing, and maths'),
+        html.Br(),
         
-    # Dropdown and title
-    html.Div( 
-        children=[
-            html.H3('Town centre selection'),
+        # Dropdown and title
+        html.Div( 
+            children=[
+                html.H3('Town centre selection'),
             
-            dcc.Dropdown(id='major_cat_dd',
-                options=[{'label':category, 'value':category} for category in major_categories], multi = True),
+                dcc.Dropdown(id='major_cat_dd',
+                    options=[{'label':category, 'value':category} for category in major_categories], multi = True),
         #    
-            html.Br(),
+                html.Br(),
             
-            html.H3('Ward selection'),
+                html.H3('Ward selection'),
             
-            dcc.Dropdown(id='minor_cat_dd',
-                options=[{'label':categori, 'value':categori} for categori in minor_categories], multi = True)
+                dcc.Dropdown(id='minor_cat_dd',
+                    options=[{'label':categori, 'value':categori} for categori in minor_categories], multi = True)
                
-        ],
-    style={'width':'350px', 'display':'block', 'vertical-align':'top', 'border':'1px solid black', 'padding':'10px', 'margin':'auto'}
-    ),
+            ],
+        style={'width':'350px', 'display':'block', 'vertical-align':'top', 'border':'1px solid black', 'padding':'10px', 'margin':'auto'}
+        ),
     
-    html.Div(
-        children=[
-        # Bar graph
-        dcc.Graph(
-          id='my-bar-graph')#,
-          # Insert the bar graph
-          #figure=bar_fig)
-        ]    
-    ,style={'text-align':'center', 'display':'inline-block', 'width':'100%'} 
-    ),
+        html.Div(
+            children=[
+            # Bar graph
+            dcc.Graph(
+              id='my-bar-graph')#,
+              # Insert the bar graph
+              #figure=bar_fig)
+            ]    
+        ,style={'text-align':'center', 'display':'inline-block', 'width':'100%'} 
+        ),
     
-    html.Div(
-        d_table, 
-        style={'width':'80%', 'height':'200px', 'margin':'10px auto', 'padding-right':'30px'})
+        html.Div(
+            d_table, 
+            style={'width':'80%', 'height':'200px', 'margin':'10px auto', 'padding-right':'30px'})
+        ]),
+        
+        dcc.Tab(label='Tab two', children=[
+        html.H1('Welcome to tab 2')
+        ])
+        
+    ])
 ])
     
 
