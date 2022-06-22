@@ -28,14 +28,11 @@ from dash.dependencies import Input, Output
 
 import plotly.graph_objects as go
 
-data = pd.read_csv("A1a - KS2 standard RWM.csv")
-#data = data.groupby(['Year-Month','Country'])['OrderValue'].agg('sum').reset_index(name='Total Sales ($)')
+# ## Tab 1 data preparation
 
-# +
-#tc_lookup_fold = "../../../../../Lambeth Council/Data, Analytics & Insight - Analytics Team - Private - Data Science Team - Private/IBD/IBD/data/external/area_lookups"
+data = pd.read_csv("data/A1a - KS2 standard RWM.csv")
 
-tc_lookup = pd.read_csv("town_centre_ward_lookup.csv")
-# -
+tc_lookup = pd.read_csv("data/town_centre_ward_lookup.csv")
 
 data = data.merge(tc_lookup, left_on = "Ward name", right_on = "Ward", how = "left").drop("Ward", axis = 1)
 
@@ -43,7 +40,7 @@ data['value_perc'] = (round(data['A1a - % KS2 students achieving expected standa
 
 data.head()
 
-# ## Create a table
+# #### Tab 1 - Create a table
 
 large_tb = data
 
@@ -90,20 +87,28 @@ d_table = DataTable(
             page_size=10
             )
 
-# ## Create dropdown and categories for dropdown
+# #### Tab 1 - create dropdown and categories for dropdown
 
 major_categories = list(data['Town centre'].dropna().unique())
 minor_categories = list(data['Ward name'].unique())
 
-# ## Create the Dash app
+# ## Tab 2 data preparation
 
-# ### Setup the layout
+lambeth_pred_data = pd.read_csv("data/pred_pop_2018_lam_group.csv")
+
+lambeth_pred_data_m = lambeth_pred_data.drop('age',axis=1).melt(id_vars = "ward_name").rename(columns={"variable":"year","value":"pop"})
+
+minor_categories_2 = list(lambeth_pred_data['ward_name'].unique())
+
+# ## Create the Dash app
 
 app = dash.Dash(__name__)
 server = app.server
 
 # server = flask.Flask(__name__)
 # app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
+
+# # Setup the layout
 
 # Set up the layout with a single graph
 app.layout = html.Div([
@@ -150,14 +155,40 @@ app.layout = html.Div([
         ]),
         
         dcc.Tab(label='Tab two', children=[
-        html.H1('Welcome to tab 2')
+        html.H1('Welcome to tab 2'),
+            
+        
+            
+        html.Div( 
+            children=[
+                 html.H3('Ward selection'),
+                
+                 dcc.Dropdown(id='minor_cat_dd_2',
+                 options=[{'label':categori, 'value':categori} for categori in minor_categories], multi = True)
+               
+            ],
+        style={'width':'350px', 'display':'block', 'vertical-align':'top', 'border':'1px solid black', 'padding':'10px', 'margin':'auto'}
+        ),
+            
+        html.Div(
+            children=[
+            # Bar graph
+            dcc.Graph(
+              id='my-line-graph')#,
+              # Insert the bar graph
+              #figure=bar_fig)
+            ]    
+        ,style={'text-align':'center', 'display':'inline-block', 'width':'100%'} 
+        )
         ])
         
     ])
 ])
     
 
-# ## Create callback for category filter interaction with graph
+# ## Tab 1 callbacks
+
+# #### Callback for category filter interaction with graph
 
 # +
 @app.callback(
@@ -165,18 +196,6 @@ app.layout = html.Div([
    #Output('chosen_major_cat_title', 'children'),
    Input('major_cat_dd', 'value'),
    Input('minor_cat_dd', 'value'))
-
-#def update_dd(major_cat_dd):
- #   major_minor = data[['Town centre', 'Ward name']].drop_duplicates()
-  #  relevant_minor = major_minor[major_minor['Town centre'] == major_cat_dd]['Ward name'].values.tolist()
-   # minor_options = [dict(label=x, value=x) for x in relevant_minor]
-
-    #if not major_cat_dd:
-     #   major_cat_dd = 'ALL'
-    
-    #major_cat_title = f'This is in the Major Category of : {major_cat_dd}'
-
-    #return minor_options, major_cat_title
 
 def update_bar(major_cat_dd, minor_cat_dd):
     major_cat_title = 'All'
@@ -236,7 +255,7 @@ def update_bar(major_cat_dd, minor_cat_dd):
 
 # -
 
-# ## Major category dropdown interaction with minor category dropdown
+# #### Callback - major category dropdown interaction with minor category dropdown
 
 # +
 @app.callback(
@@ -254,17 +273,78 @@ def update_dd(major_cat_dd):
         relevant_minor = major_minor[major_minor['Town centre'].isin(major_cat_dd)]['Ward name'].values.tolist()
         minor_options = [dict(label=x, value=x) for x in relevant_minor]
 
-    #if not major_cat_dd:
-        #major_cat_dd = 'ALL'
-    
-   # major_cat_title = f'This is in the Major Category of : {major_cat_dd}'
-
     return minor_options#, major_cat_title
 
 
 # -
 
-# ### Run the app
+# # Tab 2 callbacks
+
+# +
+@app.callback(
+   Output('my-line-graph', 'figure'),
+   #Output('chosen_major_cat_title', 'children'),
+   #Input('major_cat_dd', 'value'),
+   Input('minor_cat_dd_2', 'value'))
+
+def update_line(minor_cat_dd_2):
+    major_cat_title = 'All'
+    data_line = lambeth_pred_data_m.copy()
+    
+    #if major_cat_dd:
+     #   major_cat_title = major_cat_dd
+     #   data_line = data_line[data_line['Town centre'].isin(major_cat_dd)]
+        
+    if minor_cat_dd_2:
+        major_cat_title = minor_cat_dd_2
+        data_line = data_line[data_line['ward_name'].isin(minor_cat_dd_2)]
+        
+    #data_line = data_line.groupby('Year-Month')['OrderValue'].agg('sum').reset_index(name='Total Sales ($)')
+    
+    line_graph = px.line(data_line, x='year', y='pop',
+    height=600, # width=1000, , 
+    title=f'Predicted population in areas: {major_cat_title}', 
+    custom_data=['ward_name','pop'], color='ward_name', template='simple_white'#, text='pop'
+                  )# text_auto=True,
+    
+    # Bar appearance
+    line_graph.update_traces(marker_line_color='rgb(8,48,107)',# marker_color='rgb(158,202,225)', 
+    marker_line_width=1.5, opacity=0.6)
+    
+    # Text label appearance
+    line_graph.update_traces(textfont_size=12,
+                        #textangle=0,
+                        textposition="top center"
+                       )        
+
+    # Title options  
+    line_graph.update_layout(#{title:{'x':0.5}},
+                        title={
+                        'y':0.9,
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top'},
+                        xaxis_title=None,
+                        yaxis_title="Population")
+
+    # xaxis label options
+    line_graph.update_layout(
+                        xaxis_tickangle=-45
+    )
+
+    # hover popup options
+    line_graph.update_traces(
+        hovertemplate="<br>".join([
+            "Ward: %{customdata[0]}",
+            "Value: %{customdata[1]}"]
+    ))
+    
+    return line_graph
+
+
+# -
+
+# ## Run the app
 
 # Set the app to run in development mode
 if __name__ == '__main__':
