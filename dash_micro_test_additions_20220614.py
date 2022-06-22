@@ -26,9 +26,6 @@ from dash_table import DataTable, FormatTemplate
 import pandas as pd
 from dash.dependencies import Input, Output
 
-# server = flask.Flask(__name__)
-# app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
-
 import plotly.graph_objects as go
 
 data = pd.read_csv("A1a - KS2 standard RWM.csv")
@@ -70,93 +67,43 @@ d_columns += [
 ]
 # -
 
+d_table = DataTable(
+  			id='my_dt',
+            columns=d_columns,
+            data=large_tb.to_dict('records'),
+            style_data={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+            },
+            style_header={
+                'whiteSpace': 'normal',
+                'height': 'auto',
+            },
+            cell_selectable=True,
+            sort_action='native',
+  			# Make single columns selectable
+            column_selectable='single',
+            row_selectable='multi',
+            filter_action='native',
+            page_action='native',
+            page_current=0,
+            page_size=10
+            )
+
 # ## Create dropdown and categories for dropdown
 
 major_categories = list(data['Town centre'].dropna().unique())
 minor_categories = list(data['Ward name'].unique())
 
-major_categories
-
-minor_categories
-
-# #### Making a bar using the 'Figure'command. Doesn't seem to work well, and I can't get customdata to work
-
-# data_bar = data.copy()
-#
-# bar_graph = go.Figure(data=go.Bar(x=data_bar['Ward name'], 
-#                                       y=data_bar['A1a - % KS2 students achieving expected standard in reading, writing, and maths in town centre areas']))#, 
-#                       #customdata = ['Town centre', "Ward name", "value_perc"])#,
-#                          #width=1200, height=600, 
-#                          #title=f'% KS2 students achieving expected standard in\nreading, writing, and maths in town centre areas:', 
-#                          #custom_data=['Town centre'], color='Ward name', template='simple_white', text_auto=True, textposition ='auto', 
-#                          #text=data_bar['A1a - % KS2 students achieving expected standard in reading, writing, and maths in town centre areas'])#
-#     
-# bar_graph.update_traces(marker_line_color='rgb(8,48,107)',# marker_color='rgb(158,202,225)', 
-#                   marker_line_width=1.5, opacity=0.6)
-#
-# bar_graph.update_layout(title_text='KS2 students achieving expected standard in\nreading, writing, and maths in town centre areas')
-#     
-#     
-# #### hover popup options
-# bar_graph.update_traces(
-#     hovertemplate="<br>".join([
-#             "Ward: %{customdata[1]}",
-#             "Town centre area: %{customdata[0]}",
-#             "Value: %{customdata[2]}"]
-# ))
-
-# major_cat_title = "All"
-#
-# data_bar = data.copy()
-#
-# bar_graph = px.bar(data_bar, x='Ward name', 
-#                        y='A1a - % KS2 students achieving expected standard in reading, writing, and maths in town centre areas',
-#     width=800, height=600, 
-#     title=f'% KS2 students achieving expected standard in<br>reading, writing, and maths in town centre areas: {major_cat_title}', 
-#     custom_data=['Town centre', "Ward name", "value_perc"], color='Ward name', template='simple_white', text='value_perc'
-#                   )# text_auto=True,
-#     
-# #### Bar appearance
-# bar_graph.update_traces(marker_line_color='rgb(8,48,107)',# marker_color='rgb(158,202,225)', 
-# marker_line_width=1.5, opacity=0.6)
-#     
-# #### Text label appearance
-# bar_graph.update_traces(textfont_size=12,
-#                         textangle=0,
-#                         textposition="outside"
-#                        )        
-#
-# #### Title options  
-# bar_graph.update_layout(#{title:{'x':0.5}},
-#                         title={
-#                         'y':0.9,
-#                         'x':0.5,
-#                         'xanchor': 'center',
-#                         'yanchor': 'top'},
-#                         xaxis_title=None,
-#                         yaxis_title="A1a - % KS2 students achieving expected standard<br>in reading, writing, and maths (%)")
-#
-# #### xaxis label options
-# bar_graph.update_layout(
-#                         xaxis_tickangle=-45
-# )
-#
-# #### hover popup options
-# bar_graph.update_traces(
-#     hovertemplate="<br>".join([
-#             "Ward: %{customdata[1]}",
-#             "Town centre: %{customdata[0]}",
-#             "Value: %{customdata[2]}"]
-# ))
-#                         
-
 # ## Create the Dash app
 
 # ### Setup the layout
 
-# +
 app = dash.Dash(__name__)
 server = app.server
+
+# server = flask.Flask(__name__)
+# app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
 
 # Set up the layout with a single graph
 app.layout = html.Div([
@@ -193,10 +140,13 @@ app.layout = html.Div([
           #figure=bar_fig)
         ]    
     ,style={'text-align':'center', 'display':'inline-block', 'width':'100%'} 
-    )
+    ),
+    
+    html.Div(
+        d_table, 
+        style={'width':'80%', 'height':'200px', 'margin':'10px auto', 'padding-right':'30px'})
 ])
     
-# -
 
 # ## Create callback for category filter interaction with graph
 

@@ -1,0 +1,9 @@
+On sharepoint page - cog in top right - site information - all site settings - under Site Collection Admin - HTML field security - allow contributors to insert iframes from any domain
+
+Embed code for Heroku
+
+<iframe src="https://dashtest91.herokuapp.com" title="Heroku" width=800px height=600px></iframe>
+
+https://lambeth.sharepoint.com/sites/Data-Analytics-Insight/
+
+https://lambeth.sharepoint.com/sites/Data-Analytics-Insight/SitePages/Dash-embedding-test.aspx
