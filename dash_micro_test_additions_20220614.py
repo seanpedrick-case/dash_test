@@ -26,8 +26,8 @@ from dash_table import DataTable, FormatTemplate
 import pandas as pd
 from dash.dependencies import Input, Output
 
-server = flask.Flask(__name__)
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
+# server = flask.Flask(__name__)
+# app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
 
 import plotly.graph_objects as go
 
