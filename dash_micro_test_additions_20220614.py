@@ -26,6 +26,9 @@ from dash_table import DataTable, FormatTemplate
 import pandas as pd
 from dash.dependencies import Input, Output
 
+server = flask.Flask(__name__)
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
+
 import plotly.graph_objects as go
 
 data = pd.read_csv("A1a - KS2 standard RWM.csv")
@@ -153,6 +156,7 @@ minor_categories
 
 # +
 app = dash.Dash(__name__)
+server = app.server
 
 # Set up the layout with a single graph
 app.layout = html.Div([
