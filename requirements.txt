@@ -8,3 +8,4 @@ django
 gunicorn
 django-heroku
 Werkzeug==2.0.0
+json

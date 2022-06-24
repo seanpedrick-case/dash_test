@@ -27,6 +27,7 @@ import pandas as pd
 from dash.dependencies import Input, Output
 
 import plotly.graph_objects as go
+import json
 
 # ## Tab 1 data preparation
 
@@ -100,6 +101,36 @@ lambeth_pred_data_m = lambeth_pred_data.drop('age',axis=1).melt(id_vars = "ward_
 
 minor_categories_2 = list(lambeth_pred_data['ward_name'].unique())
 
+# #### Create a map
+
+# +
+#from urllib.request import urlopen
+with open('data/lambeth_old_wards_wgs84.geojson') as response:
+    lambeth_ward_json = json.load(response)
+
+#lambeth_ward_json["features"][0]
+# -
+
+data.columns
+
+data['WD13NM'] = data['Ward name']
+
+# +
+fig = px.choropleth_mapbox(data, geojson=lambeth_ward_json, locations='WD13NM', color='value_perc',
+                           color_continuous_scale="Viridis", featureidkey="properties.WD13NM",
+                           range_color=(0, 12),
+                           mapbox_style="carto-positron",
+                           center = {"lat": 51.4935, "lon": -0.11},
+                           zoom=11,
+                           #scope="europe",
+                           labels={'value_perc':'KS2 students achieving expected standard'}
+                          )
+
+fig.update_layout(height=800)
+#fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+#fig.show()
+# -
+
 # ## Create the Dash app
 
 app = dash.Dash(__name__)
@@ -151,8 +182,19 @@ app.layout = html.Div([
     
         html.Div(
             d_table, 
-            style={'width':'80%', 'height':'200px', 'margin':'10px auto', 'padding-right':'30px'})
+            style={'width':'80%', 'height':'200px', 'margin':'10px auto', 'padding-right':'30px','display':'inline'}),
+        
+        
+        #### Map
+        html.Div( 
+            dcc.Graph(
+              id='my-map', figure=fig),
+              style={'width':'800px', 'margin':'auto', 'display':'inline'}
+        
+        ),
+            
         ]),
+        
         
         dcc.Tab(label='Tab two', children=[
         html.H1('Welcome to tab 2'),
@@ -184,7 +226,7 @@ app.layout = html.Div([
         
     ])
 ])
-    
+
 
 # ## Tab 1 callbacks
 
