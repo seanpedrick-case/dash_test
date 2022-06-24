@@ -28,6 +28,7 @@ from dash.dependencies import Input, Output
 
 import plotly.graph_objects as go
 import json
+import matplotlib
 
 # ## Tab 1 data preparation
 
@@ -115,28 +116,41 @@ data.columns
 
 data['WD13NM'] = data['Ward name']
 
+data["value_perc_float"] = data["value_perc"].str.replace('%','').astype(float)
+
 # +
-fig = px.choropleth_mapbox(data, geojson=lambeth_ward_json, locations='WD13NM', color='value_perc',
-                           color_continuous_scale="Viridis", featureidkey="properties.WD13NM",
-                           range_color=(0, 12),
+fig = px.choropleth_mapbox(data, geojson=lambeth_ward_json, locations='WD13NM', color='value_perc_float',
+                           featureidkey="properties.WD13NM",
                            mapbox_style= "carto-positron", # "open-street-map",
                            center = {"lat": 51.4535, "lon": -0.11},
                            zoom=11,
                            #scope="europe",
-                           labels={'value_perc':'KS2 students achieving expected standard'},
+                           labels={'value_perc_float':'KS2 students achieving expected standard (%)'},
                            custom_data=["WD13NM"],
                            opacity=0.3
                           )
 
+fig.update_coloraxes(colorscale="Viridis"),
+                  #colorscale= [[0, 'rgb(0,0,255,0.2)'], [1, 'rgb(255,0,0,2)']],)
+
 fig.update_layout(height=800, 
                   margin={"r":0,"t":0,"l":0,"b":0},
-                  legend=dict(
+                  coloraxis_colorbar=dict(
+                    title="KS2 students achieving<br>expected standard (%)",
+                    thicknessmode="pixels", thickness=50,
+                    lenmode="pixels", len=200,
                     yanchor="top",
                     y=0.99,
                     xanchor="left",
-                    x=0.01
+                    x=0.01,
+                    borderwidth = 1,
+                    bgcolor = "rgba(255,255,255,0.4)",
+                    ticks="outside", 
+                    ticksuffix="%",
+                    dtick=2
+                  )
                     )
-                 )
+                 
 # -
 
 # ## Create the Dash app
