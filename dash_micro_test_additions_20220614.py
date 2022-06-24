@@ -28,7 +28,7 @@ from dash.dependencies import Input, Output
 
 import plotly.graph_objects as go
 import json
-import matplotlib
+#import matplotlib
 
 # ## Tab 1 data preparation
 
