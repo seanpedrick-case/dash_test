@@ -119,16 +119,24 @@ data['WD13NM'] = data['Ward name']
 fig = px.choropleth_mapbox(data, geojson=lambeth_ward_json, locations='WD13NM', color='value_perc',
                            color_continuous_scale="Viridis", featureidkey="properties.WD13NM",
                            range_color=(0, 12),
-                           mapbox_style="carto-positron",
-                           center = {"lat": 51.4935, "lon": -0.11},
+                           mapbox_style= "carto-positron", # "open-street-map",
+                           center = {"lat": 51.4535, "lon": -0.11},
                            zoom=11,
                            #scope="europe",
-                           labels={'value_perc':'KS2 students achieving expected standard'}
+                           labels={'value_perc':'KS2 students achieving expected standard'},
+                           custom_data=["WD13NM"],
+                           opacity=0.3
                           )
 
-fig.update_layout(height=800)
-#fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-#fig.show()
+fig.update_layout(height=800, 
+                  margin={"r":0,"t":0,"l":0,"b":0},
+                  legend=dict(
+                    yanchor="top",
+                    y=0.99,
+                    xanchor="left",
+                    x=0.01
+                    )
+                 )
 # -
 
 # ## Create the Dash app
